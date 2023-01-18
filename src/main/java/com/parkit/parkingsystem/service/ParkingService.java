@@ -20,6 +20,7 @@ public class ParkingService {
     private InputReaderUtil inputReaderUtil;
     private ParkingSpotDAO parkingSpotDAO;
     private  TicketDAO ticketDAO;
+    private boolean recurrentUser=false;
 
     public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO){
         this.inputReaderUtil = inputReaderUtil;
@@ -34,7 +35,6 @@ public class ParkingService {
                 String vehicleRegNumber = getVehichleRegNumber();
                 parkingSpot.setAvailable(false);
                 parkingSpotDAO.updateParking(parkingSpot);//allot this parking space and mark it's availability as false
-
                 Date inTime = new Date();
                 Ticket ticket = new Ticket();
                 //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
@@ -100,11 +100,14 @@ public class ParkingService {
     public void processExitingVehicle() {
         try{
             String vehicleRegNumber = getVehichleRegNumber();
+            Ticket oldTicket = ticketDAO.getOldTicket(vehicleRegNumber);
+            if(oldTicket.getOutTime()!=null) {  recurrentUser=true;  }
             Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
             Date outTime = new Date();
             ticket.setOutTime(outTime);
             fareCalculatorService.calculateFare(ticket);
-            if(ticketDAO.updateTicket(ticket)) {
+    		if(recurrentUser) {  ticket.setPrice(0.95*ticket.getPrice());  }
+            if(ticketDAO.updateTicket(ticket))    {
                 ParkingSpot parkingSpot = ticket.getParkingSpot();
                 parkingSpot.setAvailable(true);
                 parkingSpotDAO.updateParking(parkingSpot);
@@ -117,4 +120,18 @@ public class ParkingService {
             logger.error("Unable to process exiting vehicle",e);
         }
     }
+
+	/**
+	 * @return the recurrentUser
+	 */
+	public boolean isRecurrentUser() {
+		return recurrentUser;
+	}
+
+	/**
+	 * @param recurrentUser the recurrentUser to set
+	 */
+	public void setRecurrentUser(boolean recurrentUser) {
+		this.recurrentUser = recurrentUser;
+	}
 }
