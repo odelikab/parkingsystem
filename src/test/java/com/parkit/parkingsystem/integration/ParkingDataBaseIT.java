@@ -56,13 +56,6 @@ public class ParkingDataBaseIT {
         when(inputReaderUtil.readSelection()).thenReturn(1);
         when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
         dataBasePrepareService.clearDataBaseEntries();
-//        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR,false);
-//        Ticket ticket = new Ticket();
-//        ticket.setInTime(new Date(System.currentTimeMillis() - (60*60*1000)));
-//        ticket.setParkingSpot(parkingSpot);
-//        ticket.setVehicleRegNumber("ABCDEF");
-//        when(ticketDAO.saveTicket(any(Ticket.class))).thenReturn(true);
-
     }
 
     @AfterAll

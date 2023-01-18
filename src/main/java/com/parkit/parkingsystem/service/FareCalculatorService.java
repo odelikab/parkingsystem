@@ -6,7 +6,6 @@ import com.parkit.parkingsystem.model.Ticket;
 
 public class FareCalculatorService {
 	
-//	private TicketDAO ticketDAO = new TicketDAO();
 	
     public void calculateFare(Ticket ticket){
         if( (ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime())) ){
@@ -18,7 +17,6 @@ public class FareCalculatorService {
 
         //TODO: Some tests are failing here. Need to check if this logic is correct
         long durationMinutes =  (outMinutes - inMinutes)/1000/60;
-//        String vehicleRegNumber = ticket.getVehicleRegNumber();
         
         if (durationMinutes <= 30) {
 			ticket.setPrice(0);
@@ -38,16 +36,6 @@ public class FareCalculatorService {
 			throw new IllegalArgumentException("Unkown Parking Type");
 		}
 		
-//		TicketDAO ticketDAO = new TicketDAO();
-//		Ticket oldTicket = new Ticket();
-//         oldTicket = ticketDAO.getTicket(vehicleRegNumber);
-//        oldTicket.getOutTime()
-//
-//		if (oldTicket==null ) {
-//			System.out.println("try");
-//			ticket.setPrice(0.95 * ticket.getPrice());
-//		}
-
     }
     
 }
