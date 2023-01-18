@@ -115,4 +115,26 @@ public class TicketDAO {
         }
         return false;
     }
+    
+    public boolean isRecurrentUser(String vehicleRegNumber) {
+        Connection con = null;
+        try {
+			con = dataBaseConfig.getConnection();
+			PreparedStatement ps = con.prepareStatement(DBConstants.GET_OLD_TICKETS);
+			ps.setString(1, vehicleRegNumber);
+			ResultSet rs = ps.executeQuery();
+			int rowsCount = 0;
+			if (rs.last()) { // Ticket ticket = new Ticket();
+				rowsCount = rs.getRow();
+				System.out.println(rowsCount);
+			}
+			if (rowsCount >= 2)
+				return true;
+        }catch (Exception ex){
+            logger.error("Error retrieve ticket info",ex);
+        }finally {
+            dataBaseConfig.closeConnection(con);
+        }
+        return false;
+    }
 }
