@@ -20,7 +20,6 @@ public class ParkingService {
     private InputReaderUtil inputReaderUtil;
     private ParkingSpotDAO parkingSpotDAO;
     private  TicketDAO ticketDAO;
-    private boolean recurrentUser=false;
 
     public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO){
         this.inputReaderUtil = inputReaderUtil;
@@ -98,15 +97,16 @@ public class ParkingService {
     public void processExitingVehicle() {
         try{
 			String vehicleRegNumber = getVehichleRegNumber();
-			Ticket oldTicket = ticketDAO.getOldTicket(vehicleRegNumber);
-			if (oldTicket.getOutTime() != null) {
-				recurrentUser = true;
-			}
+////			boolean recurrentUser=false;
+//			Ticket oldTicket = ticketDAO.getOldTicket(vehicleRegNumber);
+//			if (oldTicket.getOutTime() != null) {
+//				recurrentUser = true;
+//			}
 			Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
 			Date outTime = new Date();
 			ticket.setOutTime(outTime);
 			fareCalculatorService.calculateFare(ticket);
-			if (recurrentUser) {
+			if (ticketDAO.isRecurrentUser(vehicleRegNumber)) {
 				ticket.setPrice(0.95 * ticket.getPrice());
 			}
             if(ticketDAO.updateTicket(ticket))    {
@@ -123,17 +123,4 @@ public class ParkingService {
         }
     }
 
-	/**
-	 * @return the recurrentUser
-	 */
-	public boolean isRecurrentUser() {
-		return recurrentUser;
-	}
-
-	/**
-	 * @param recurrentUser the recurrentUser to set
-	 */
-	public void setRecurrentUser(boolean recurrentUser) {
-		this.recurrentUser = recurrentUser;
-	}
 }

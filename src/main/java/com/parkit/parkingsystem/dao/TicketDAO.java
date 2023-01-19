@@ -69,12 +69,12 @@ public class TicketDAO {
         }
     }
     
-    public Ticket getOldTicket(String vehicleRegNumber) {
+    public Ticket getLastTicket(String vehicleRegNumber) {
         Connection con = null;
         Ticket ticket = null;
         try {
             con = dataBaseConfig.getConnection();
-            PreparedStatement ps = con.prepareStatement(DBConstants.GET_OLDEST_TICKET);
+            PreparedStatement ps = con.prepareStatement(DBConstants.GET_LAST_TICKET);
             //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
             ps.setString(1,vehicleRegNumber);
             ResultSet rs = ps.executeQuery();
@@ -126,7 +126,7 @@ public class TicketDAO {
 			int rowsCount = 0;
 			if (rs.last()) { // Ticket ticket = new Ticket();
 				rowsCount = rs.getRow();
-				System.out.println(rowsCount);
+//				System.out.println(rowsCount);
 			}
 			if (rowsCount >= 2)
 				return true;
