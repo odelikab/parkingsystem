@@ -97,11 +97,6 @@ public class ParkingService {
     public void processExitingVehicle() {
         try{
 			String vehicleRegNumber = getVehichleRegNumber();
-////			boolean recurrentUser=false;
-//			Ticket oldTicket = ticketDAO.getOldTicket(vehicleRegNumber);
-//			if (oldTicket.getOutTime() != null) {
-//				recurrentUser = true;
-//			}
 			Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
 			Date outTime = new Date();
 			ticket.setOutTime(outTime);

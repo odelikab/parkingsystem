@@ -124,9 +124,8 @@ public class TicketDAO {
 			ps.setString(1, vehicleRegNumber);
 			ResultSet rs = ps.executeQuery();
 			int rowsCount = 0;
-			if (rs.last()) { // Ticket ticket = new Ticket();
+			if (rs.last()) { 
 				rowsCount = rs.getRow();
-//				System.out.println(rowsCount);
 			}
 			if (rowsCount >= 2)
 				return true;

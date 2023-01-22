@@ -1,15 +1,12 @@
 package com.parkit.parkingsystem.integration;
 
-import com.parkit.parkingsystem.constants.Fare;
-import com.parkit.parkingsystem.constants.ParkingType;
-import com.parkit.parkingsystem.dao.ParkingSpotDAO;
-import com.parkit.parkingsystem.dao.TicketDAO;
-import com.parkit.parkingsystem.integration.config.DataBaseTestConfig;
-import com.parkit.parkingsystem.integration.service.DataBasePrepareService;
-import com.parkit.parkingsystem.model.ParkingSpot;
-import com.parkit.parkingsystem.model.Ticket;
-import com.parkit.parkingsystem.service.ParkingService;
-import com.parkit.parkingsystem.util.InputReaderUtil;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
+import java.util.Date;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,16 +15,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-
-import java.util.Date;
+import com.parkit.parkingsystem.constants.Fare;
+import com.parkit.parkingsystem.constants.ParkingType;
+import com.parkit.parkingsystem.dao.ParkingSpotDAO;
+import com.parkit.parkingsystem.dao.TicketDAO;
+import com.parkit.parkingsystem.integration.config.DataBaseTestConfig;
+import com.parkit.parkingsystem.integration.service.DataBasePrepareService;
+import com.parkit.parkingsystem.model.ParkingSpot;
+import com.parkit.parkingsystem.model.Ticket;
+import com.parkit.parkingsystem.service.FareCalculatorService;
+import com.parkit.parkingsystem.service.ParkingService;
+import com.parkit.parkingsystem.util.InputReaderUtil;
 
 @ExtendWith(MockitoExtension.class)
 public class ParkingDataBaseIT {
@@ -39,6 +37,9 @@ public class ParkingDataBaseIT {
 
     @Mock
     private static InputReaderUtil inputReaderUtil;
+    
+    @Mock
+    private static FareCalculatorService fareCalculatorService;
 
     @BeforeAll
     private static void setUp() throws Exception{
@@ -61,7 +62,7 @@ public class ParkingDataBaseIT {
 
     }
 
-//    @Test
+    @Test
     public void testParkingACar(){
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         parkingService.processIncomingVehicle();
@@ -70,37 +71,52 @@ public class ParkingDataBaseIT {
         assertEquals(2,parkingSpotDAO.getNextAvailableSlot(ticketDAO.getTicket("ABCDEF").getParkingSpot().getParkingType()));
     }
 
-//    @Test
+    @Test
     public void testParkingLotExit(){
-        testParkingACar();
+    	testParkingACar();
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         parkingService.processExitingVehicle();
         //TODO: check that the fare generated and out time are populated correctly in the database
         Ticket ticket = ticketDAO.getTicket("ABCDEF");
-
         assertNotNull(ticket.getPrice());
         assertNotNull(ticket.getOutTime());
     }
 
 	@Test
 	public void testRecurrentUser() {
+		testParkingACar();
+        dataBasePrepareService.clearDataBaseEntries();
 		ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 		Ticket ticket = new Ticket();
 
 		// first time ABCDEF enters the parking
-		parkingService.processIncomingVehicle();
-		parkingService.processExitingVehicle();
-		// second time ABCDEF enters the parking
-		ticket = ticketDAO.getTicket("ABCDEF");
+        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR,false);
+        ticket.setParkingSpot(parkingSpot);
+        ticket.setVehicleRegNumber("ABCDEF");		
 		ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
 		ticket.setOutTime(null);
 		ticketDAO.saveTicket(ticket);
-		ticketDAO.isRecurrentUser("ABCDEF");
 		parkingService.processExitingVehicle();
-		ticket = null;
-		ticket = ticketDAO.getLastTicket("ABCDEF");
-//        long durationMinutes =  (ticket.getOutTime().getTime() - ticket.getInTime().getTime())/1000/60;
+		// second time ABCDEF enters the parking
+//		when().thenReturn( );
+//		ticket.setOutTime(new Date(System.currentTimeMillis() + (60 * 60 * 1000)));
+//		ticketDAO.updateTicket(ticket);
+//		ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
+//		ticket.setOutTime(null);
+//		ticket.setPrice(0);
+//		ticketDAO.saveTicket(ticket);
+//		ticket = null;
+		
+		ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
+		ticket.setOutTime(null);
+		ticketDAO.saveTicket(ticket);
+//		ticket = ticketDAO.getTicket("ABCDEF");
+//        ticket.setOutTime(new Date(System.currentTimeMillis() + (60 * 60 * 1000)));
+//		ticketDAO.updateTicket(ticket);
+//		ticketDAO.isRecurrentUser("ABCDEF");
+		parkingService.processExitingVehicle();
+		ticket = ticketDAO.getTicket("ABCDEF");
 
-        assertEquals(0.95*(Fare.CAR_RATE_PER_HOUR),ticket.getPrice());
+        assertEquals(0.95*Fare.CAR_RATE_PER_HOUR,ticket.getPrice());
     }    
 }
