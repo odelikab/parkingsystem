@@ -84,7 +84,7 @@ public class ParkingDataBaseIT {
 
 	@Test
 	public void testRecurrentUser() {
-		testParkingACar();
+		testParkingLotExit();
         dataBasePrepareService.clearDataBaseEntries();
 		ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 		Ticket ticket = new Ticket();
@@ -93,27 +93,15 @@ public class ParkingDataBaseIT {
         ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR,false);
         ticket.setParkingSpot(parkingSpot);
         ticket.setVehicleRegNumber("ABCDEF");		
-		ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
+		ticket.setInTime(new Date(System.currentTimeMillis() - (120 * 60 * 1000)));
 		ticket.setOutTime(null);
 		ticketDAO.saveTicket(ticket);
 		parkingService.processExitingVehicle();
+
 		// second time ABCDEF enters the parking
-//		when().thenReturn( );
-//		ticket.setOutTime(new Date(System.currentTimeMillis() + (60 * 60 * 1000)));
-//		ticketDAO.updateTicket(ticket);
-//		ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
-//		ticket.setOutTime(null);
-//		ticket.setPrice(0);
-//		ticketDAO.saveTicket(ticket);
-//		ticket = null;
-		
 		ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
 		ticket.setOutTime(null);
 		ticketDAO.saveTicket(ticket);
-//		ticket = ticketDAO.getTicket("ABCDEF");
-//        ticket.setOutTime(new Date(System.currentTimeMillis() + (60 * 60 * 1000)));
-//		ticketDAO.updateTicket(ticket);
-//		ticketDAO.isRecurrentUser("ABCDEF");
 		parkingService.processExitingVehicle();
 		ticket = ticketDAO.getTicket("ABCDEF");
 
