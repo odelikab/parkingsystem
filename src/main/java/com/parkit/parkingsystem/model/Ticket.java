@@ -3,6 +3,8 @@ package com.parkit.parkingsystem.model;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.parkit.parkingsystem.constants.ParkingType;
+
 public class Ticket {
     private int id;
     private ParkingSpot parkingSpot;
@@ -20,11 +22,11 @@ public class Ticket {
     }
 
     public ParkingSpot getParkingSpot() {
-        return parkingSpot;
+        return new ParkingSpot(parkingSpot.getId(), parkingSpot.getParkingType(), parkingSpot.isAvailable());
     }
 
     public void setParkingSpot(ParkingSpot parkingSpot) {
-        this.parkingSpot = parkingSpot;
+        this.parkingSpot = new ParkingSpot(parkingSpot.getId(), parkingSpot.getParkingType(), parkingSpot.isAvailable());
     }
 
     public String getVehicleRegNumber() {
@@ -44,18 +46,23 @@ public class Ticket {
     }
 
     public Date getInTime() {
-        return inTime;
+        return new Date(inTime.getTime());
     }
 
     public void setInTime(Date inTime) {
-        this.inTime = inTime;
+        this.inTime = new Date(inTime.getTime());
     }
 
     public Date getOutTime() {
-        return outTime;
+        return new Date(outTime.getTime());
     }
 
-    public void setOutTime(Date outTime) {
-        this.outTime = outTime;
-    }
+	public void setOutTime(Date outTime) {
+		if (outTime != null) {
+			this.outTime = new Date(outTime.getTime());
+			
+		} else {
+			this.outTime = null;
+		}
+	}
 }
