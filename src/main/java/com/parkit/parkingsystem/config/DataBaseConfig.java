@@ -4,9 +4,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.Properties;
 
@@ -16,13 +19,19 @@ private Properties properties = new Properties();
     
 	public DataBaseConfig() {
 		try {
-			properties.load(new BufferedReader(new FileReader("src/main/resources/app.properties")));
+			BufferedReader bReader = null;
+			String filepathProperties = "src/main/resources/app.properties";
+			properties.load(bReader = new BufferedReader(
+					new InputStreamReader(new FileInputStream(filepathProperties), "UTF-8")));
+			bReader.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		finally {	
 		}
 	}
 
